@@ -33,7 +33,8 @@ module wb_ram #
 (
     parameter DATA_WIDTH = 32,              // width of data bus in bits (8, 16, 32, or 64)
     parameter ADDR_WIDTH = 16,              // width of address bus in bits
-    parameter SELECT_WIDTH = (DATA_WIDTH/8) // width of word select bus (1, 2, 4, or 8)
+    parameter SELECT_WIDTH = (DATA_WIDTH/8), // width of word select bus (1, 2, 4, or 8)
+    parameter INIT_PATH = ""
 )
 (
     input  wire                    clk,
@@ -61,7 +62,7 @@ reg ack_o_reg = 1'b0;
 // (* RAM_STYLE="BLOCK" *)
 reg [DATA_WIDTH-1:0] mem[(2**VALID_ADDR_WIDTH)-1:0];
 
-wire [VALID_ADDR_WIDTH-1:0] adr_i_valid = adr_i >> (ADDR_WIDTH - VALID_ADDR_WIDTH);
+wire [VALID_ADDR_WIDTH-1:0] adr_i_valid = adr_i[ADDR_WIDTH-1:(ADDR_WIDTH-VALID_ADDR_WIDTH)];
 
 assign dat_o = dat_o_reg;
 assign ack_o = ack_o_reg;
@@ -71,11 +72,13 @@ integer i, j;
 initial begin
     // two nested loops for smaller number of iterations per loop
     // workaround for synthesizer complaints about large loop counts
-    for (i = 0; i < 2**VALID_ADDR_WIDTH; i = i + 2**(VALID_ADDR_WIDTH/2)) begin
-        for (j = i; j < i + 2**(VALID_ADDR_WIDTH/2); j = j + 1) begin
-            mem[j] = 0;
+    if(INIT_PATH == "") begin
+        for (i = 0; i < 2**VALID_ADDR_WIDTH; i = i + 2**(VALID_ADDR_WIDTH/2)) begin
+            for (j = i; j < i + 2**(VALID_ADDR_WIDTH/2); j = j + 1) begin
+                mem[j] = 0;
+            end
         end
-    end
+    end else $readmemh(INIT_PATH, mem);
 end
 
 always @(posedge clk) begin
