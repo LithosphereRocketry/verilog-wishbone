@@ -114,6 +114,7 @@ module {{name}} #
 
 wire [{{n-1}}:0] request;
 wire [{{n-1}}:0] grant;
+wire grant_valid;
 {% for p in ports %}
 assign request[{{p}}] = wbm{{p}}_cyc_i;
 {%- endfor %}
