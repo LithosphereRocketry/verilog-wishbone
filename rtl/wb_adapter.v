@@ -188,7 +188,7 @@ always @* begin
         case (state_reg)
             STATE_IDLE: begin
                 // idle state
-                wbm_dat_o_next = 1'b0;
+                wbm_dat_o_next = {WBM_DATA_WIDTH{1'b0}};
                 wbs_cyc_o_next = wbm_cyc_i;
 
                 cycle_mask_next = {CYCLE_COUNT{1'b1}};
@@ -267,59 +267,59 @@ always @* begin
             end
         endcase
     end else if (WBS_WORD_WIDTH > WBM_WORD_WIDTH) begin
-        // slave is wider (always single cycle)
-        if (wbs_cyc_o_reg & wbs_stb_o_reg) begin
-            // cycle - hold values
-            if (wbs_ack_i | wbs_err_i | wbs_rty_i) begin
-                // end of cycle - pass through slave to master
-                // select output word based on address LSBs
-                wbm_dat_o_next = wbs_dat_i >> (wbm_adr_i[WBS_ADDR_BIT_OFFSET - 1:WBM_ADDR_BIT_OFFSET] * WBM_DATA_WIDTH);
-                wbm_ack_o_next = wbs_ack_i;
-                wbm_err_o_next = wbs_err_i;
-                wbm_rty_o_next = wbs_rty_i;
-                wbs_we_o_next = 1'b0;
-                wbs_stb_o_next = 1'b0;
-            end
-        end else begin
-            // idle - pass through master to slave
-            wbm_ack_o_next = 1'b0;
-            wbm_err_o_next = 1'b0;
-            wbm_rty_o_next = 1'b0;
-            // mask address for slave alignment
-            wbs_adr_o_next = wbm_adr_i & ({ADDR_WIDTH{1'b1}} << WBS_ADDR_BIT_OFFSET);
-            // duplicate input data across output port
-            wbs_dat_o_next = {(WBS_WORD_WIDTH / WBM_WORD_WIDTH){wbm_dat_i}};
-            wbs_we_o_next = wbm_we_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
-            // shift select lines based on address LSBs
-            wbs_sel_o_next = wbm_sel_i << (wbm_adr_i[WBS_ADDR_BIT_OFFSET - 1:WBM_ADDR_BIT_OFFSET] * WBM_SELECT_WIDTH);
-            wbs_stb_o_next = wbm_stb_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
-            wbs_cyc_o_next = wbm_cyc_i;
-        end
+        // // slave is wider (always single cycle)
+        // if (wbs_cyc_o_reg & wbs_stb_o_reg) begin
+        //     // cycle - hold values
+        //     if (wbs_ack_i | wbs_err_i | wbs_rty_i) begin
+        //         // end of cycle - pass through slave to master
+        //         // select output word based on address LSBs
+        //         wbm_dat_o_next = wbs_dat_i >> (wbm_adr_i[WBS_ADDR_BIT_OFFSET - 1:WBM_ADDR_BIT_OFFSET] * WBM_DATA_WIDTH);
+        //         wbm_ack_o_next = wbs_ack_i;
+        //         wbm_err_o_next = wbs_err_i;
+        //         wbm_rty_o_next = wbs_rty_i;
+        //         wbs_we_o_next = 1'b0;
+        //         wbs_stb_o_next = 1'b0;
+        //     end
+        // end else begin
+        //     // idle - pass through master to slave
+        //     wbm_ack_o_next = 1'b0;
+        //     wbm_err_o_next = 1'b0;
+        //     wbm_rty_o_next = 1'b0;
+        //     // mask address for slave alignment
+        //     wbs_adr_o_next = wbm_adr_i & ({ADDR_WIDTH{1'b1}} << WBS_ADDR_BIT_OFFSET);
+        //     // duplicate input data across output port
+        //     wbs_dat_o_next = {(WBS_WORD_WIDTH / WBM_WORD_WIDTH){wbm_dat_i}};
+        //     wbs_we_o_next = wbm_we_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
+        //     // shift select lines based on address LSBs
+        //     wbs_sel_o_next = wbm_sel_i << (wbm_adr_i[WBS_ADDR_BIT_OFFSET - 1:WBM_ADDR_BIT_OFFSET] * WBM_SELECT_WIDTH);
+        //     wbs_stb_o_next = wbm_stb_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
+        //     wbs_cyc_o_next = wbm_cyc_i;
+        // end
     end else begin
-        // same width - act as a simple register
-        if (wbs_cyc_o_reg & wbs_stb_o_reg) begin
-            // cycle - hold values
-            if (wbs_ack_i | wbs_err_i | wbs_rty_i) begin
-                // end of cycle - pass through slave to master
-                wbm_dat_o_next = wbs_dat_i;
-                wbm_ack_o_next = wbs_ack_i;
-                wbm_err_o_next = wbs_err_i;
-                wbm_rty_o_next = wbs_rty_i;
-                wbs_we_o_next = 1'b0;
-                wbs_stb_o_next = 1'b0;
-            end
-        end else begin
-            // idle - pass through master to slave
-            wbm_ack_o_next = 1'b0;
-            wbm_err_o_next = 1'b0;
-            wbm_rty_o_next = 1'b0;
-            wbs_adr_o_next = wbm_adr_i;
-            wbs_dat_o_next = wbm_dat_i;
-            wbs_we_o_next = wbm_we_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
-            wbs_sel_o_next = wbm_sel_i;
-            wbs_stb_o_next = wbm_stb_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
-            wbs_cyc_o_next = wbm_cyc_i;
-        end
+        // // same width - act as a simple register
+        // if (wbs_cyc_o_reg & wbs_stb_o_reg) begin
+        //     // cycle - hold values
+        //     if (wbs_ack_i | wbs_err_i | wbs_rty_i) begin
+        //         // end of cycle - pass through slave to master
+        //         wbm_dat_o_next = wbs_dat_i;
+        //         wbm_ack_o_next = wbs_ack_i;
+        //         wbm_err_o_next = wbs_err_i;
+        //         wbm_rty_o_next = wbs_rty_i;
+        //         wbs_we_o_next = 1'b0;
+        //         wbs_stb_o_next = 1'b0;
+        //     end
+        // end else begin
+        //     // idle - pass through master to slave
+        //     wbm_ack_o_next = 1'b0;
+        //     wbm_err_o_next = 1'b0;
+        //     wbm_rty_o_next = 1'b0;
+        //     wbs_adr_o_next = wbm_adr_i;
+        //     wbs_dat_o_next = wbm_dat_i;
+        //     wbs_we_o_next = wbm_we_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
+        //     wbs_sel_o_next = wbm_sel_i;
+        //     wbs_stb_o_next = wbm_stb_i & ~(wbm_ack_o | wbm_err_o | wbm_rty_o);
+        //     wbs_cyc_o_next = wbm_cyc_i;
+        // end
     end
 end
 

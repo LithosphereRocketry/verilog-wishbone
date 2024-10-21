@@ -73,11 +73,11 @@ initial begin
     // two nested loops for smaller number of iterations per loop
     // workaround for synthesizer complaints about large loop counts
     if(INIT_PATH == "") begin
-        for (i = 0; i < 2**VALID_ADDR_WIDTH; i = i + 2**(VALID_ADDR_WIDTH/2)) begin
-            for (j = i; j < i + 2**(VALID_ADDR_WIDTH/2); j = j + 1) begin
-                mem[j] = 0;
-            end
-        end
+        // for (i = 0; i < 2**VALID_ADDR_WIDTH; i = i + 2**(VALID_ADDR_WIDTH/2)) begin
+        //     for (j = i; j < i + 2**(VALID_ADDR_WIDTH/2); j = j + 1) begin
+        //         mem[j] = 0;
+        //     end
+        // end
     end else $readmemh(INIT_PATH, mem);
 end
 
