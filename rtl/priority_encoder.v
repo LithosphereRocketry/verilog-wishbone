@@ -48,8 +48,10 @@ parameter W = 2**LEVELS;
 // pad input to even power of two
 wire [W-1:0] input_padded = {{W-WIDTH{1'b0}}, input_unencoded};
 
+/* verilator lint_off UNOPTFLAT */
 wire [W/2-1:0] stage_valid[LEVELS-1:0];
 wire [W/2-1:0] stage_enc[LEVELS-1:0];
+/* lint_on */
 
 generate
     genvar l, n;
@@ -81,7 +83,7 @@ generate
     end
 endgenerate
 
-assign output_valid = stage_valid[LEVELS-1];
+assign output_valid = stage_valid[LEVELS-1][0];
 assign output_encoded = stage_enc[LEVELS-1];
 assign output_unencoded = 1 << output_encoded;
 

@@ -158,7 +158,7 @@ integer j;
 
 always @* begin
     for (j = 0; j < CYCLE_COUNT; j = j + 1) begin
-        cycle_sel_raw[j] <= wbm_sel_i[j*WBS_SELECT_WIDTH +: WBS_SELECT_WIDTH] != 0;
+        cycle_sel_raw[j] = wbm_sel_i[j*WBS_SELECT_WIDTH +: WBS_SELECT_WIDTH] != 0;
     end
 end
 
@@ -185,6 +185,7 @@ always @* begin
 
     if (WBM_WORD_WIDTH > WBS_WORD_WIDTH) begin
         // master is wider (multiple cycles may be necessary)
+        /* verilator lint_off CASEINCOMPLETE */
         case (state_reg)
             STATE_IDLE: begin
                 // idle state
@@ -265,6 +266,7 @@ always @* begin
                 wbs_stb_o_next = 1'b1;
                 state_next = STATE_WAIT_ACK;
             end
+            /* lint_on */
         endcase
     end else if (WBS_WORD_WIDTH > WBM_WORD_WIDTH) begin
         // // slave is wider (always single cycle)

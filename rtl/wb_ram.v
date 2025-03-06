@@ -60,7 +60,7 @@ reg [DATA_WIDTH-1:0] dat_o_reg = {DATA_WIDTH{1'b0}};
 reg ack_o_reg = 1'b0;
 
 // (* RAM_STYLE="BLOCK" *)
-reg [DATA_WIDTH-1:0] mem[(2**VALID_ADDR_WIDTH)-1:0];
+reg [DATA_WIDTH-1:0] mem[0:(2**VALID_ADDR_WIDTH)-1];
 
 wire [VALID_ADDR_WIDTH-1:0] adr_i_valid = adr_i[ADDR_WIDTH-1:(ADDR_WIDTH-VALID_ADDR_WIDTH)];
 
